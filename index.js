@@ -107,10 +107,7 @@ function printTable(data) {
 
     rows.unshift(headers);
     const colWidths = headers.map((_, colIndex) => {
-        return Math.min(
-            50,
-            Math.max(...rows.map(row => row[colIndex].length)) + 2
-        );
+        return Math.max(...rows.map(row => row[colIndex].length)) + 2;
     });
 
     function formatRow(row) {

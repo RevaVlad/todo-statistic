@@ -2,10 +2,23 @@ const { getAllFilePathsWithExtension, readFile } = require('./fileSystem');
 const { readLine } = require('./console');
 const path = require('path');
 
+const todoRegex = /\/\/\s*TODO:?\s*(.*)/gi;
+/*
+    Регулярное выражение для поиска комментариев с TODO в коде.
+    Используется для извлечения задач, помеченных как TODO.
+
+    Разбор регулярки:
+    - '//'   ищем две косые черты, обозначающие начало однострочного комментария.
+    - '\s*'  разрешаем любое количество пробелов после '//' (могут быть, а могут и не быть).
+    - 'TODO' сам ключевик TODO, который нужно найти (регистр не имеет значения благодаря 'i').
+    - '[:]?' необязательный двоеточие (':'), так как оно может быть, а может и не быть.
+    - '\s*'  допускаем пробелы после 'TODO:' перед самим текстом задачи.
+    - '(.*)' захватываем весь оставшийся текст строки (сама задача).
+*/
+
 const files = getFiles();
 const todos = extractTodos(files);
 
-// ToDo: sadlmfas
 console.log('Please, write your command!');
 readLine(processCommand);
 
@@ -15,7 +28,6 @@ function getFiles() {
 }
 
 function extractTodos(files) {
-    const todoRegex = /\/\/\s*TODO[:]?\s*(.*)/gi;
     return files.flatMap(({ content, fileName }) =>
         content.split('\n')
             .map(line => {

@@ -39,11 +39,29 @@ function parseTodo(todoText, fileName) {
     return { important, user, date, comment, fileName };
 }
 
+function printSorted(sortKey){
+    let sorted = []
+
+    if (sortKey === 'importance') {
+        sorted = [...todos].sort((a, b) => b.important - a.important);
+    } else if (sortKey === 'user') {
+        sorted = [...todos].sort((a, b) => (a.user || '').localeCompare(b.user || ''));
+    } else if (sortKey === 'date') {
+        sorted = [...todos].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    } else {
+        console.log('Invalid sort type');
+        return;
+    }
+
+    printTable(sorted);
+}
+
 function processCommand(command) {
     const [cmd, arg] = command.split(' ');
     switch (cmd) {
         case 'exit':
             process.exit(0);
+            break;
         case 'show':
             printTable(todos);
             break;
@@ -54,15 +72,7 @@ function processCommand(command) {
             printTable(todos.filter(todo => todo.user.toLowerCase() === arg.toLowerCase()));
             break;
         case 'sort':
-            if (arg === 'importance') {
-                printTable([...todos].sort((a, b) => b.important - a.important));
-            } else if (arg === 'user') {
-                printTable([...todos].sort((a, b) => (a.user || '').localeCompare(b.user || '')));
-            } else if (arg === 'date') {
-                printTable([...todos].sort((a, b) => (b.date || '').localeCompare(a.date || '')));
-            } else {
-                console.log('Invalid sort type');
-            }
+            printSorted(arg)
             break;
         case 'date':
             printTable(todos.filter(todo => todo.date && todo.date >= arg));

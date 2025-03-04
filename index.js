@@ -74,15 +74,29 @@ function processCommand(command) {
 
 function printTable(data) {
     const headers = ['!', 'user', 'date', 'comment', 'file'];
+
     const rows = data.map(todo => [
         todo.important ? '!' : '',
-        todo.user.padEnd(10),
-        todo.date.padEnd(10),
-        todo.comment.padEnd(50),
-        todo.fileName.padEnd(20)
+        todo.user || '',
+        todo.date || '',
+        todo.comment || '',
+        todo.fileName || ''
     ]);
-    console.log(headers.join(' | '));
-    console.log('-'.repeat(100));
-    rows.forEach(row => console.log(row.join(' | ')));
-    console.log('-'.repeat(100));
+
+    rows.unshift(headers);
+    const colWidths = headers.map((_, colIndex) => {
+        return Math.min(
+            50,
+            Math.max(...rows.map(row => row[colIndex].length)) + 2
+        );
+    });
+
+    function formatRow(row) {
+        return row.map((cell, i) => cell.padEnd(colWidths[i])).join(' | ');
+    }
+
+    console.log(formatRow(headers));
+    console.log('-'.repeat(colWidths.reduce((sum, width) => sum + width, headers.length - 1)));
+    rows.slice(1).forEach(row => console.log(formatRow(row)));
+    console.log('-'.repeat(colWidths.reduce((sum, width) => sum + width, headers.length - 1)));
 }

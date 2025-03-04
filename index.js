@@ -29,7 +29,48 @@ function extractTodos(files) {
     );
 }
 
+function parseTodo(todoText, fileName) {
+    const important = (todoText.match(/!/g) || []).length;
+    const parts = todoText.split(';').map(p => p.trim());
+    let user = '', date = '', comment = todoText;
+    if (parts.length === 3) {
+        [user, date, comment] = parts;
+    }
+    return { important, user, date, comment, fileName };
+}
 
+function processCommand(command) {
+    const [cmd, arg] = command.split(' ');
+    switch (cmd) {
+        case 'exit':
+            process.exit(0);
+        case 'show':
+            printTable(todos);
+            break;
+        case 'important':
+            printTable(todos.filter(todo => todo.important > 0));
+            break;
+        case 'user':
+            printTable(todos.filter(todo => todo.user.toLowerCase() === arg.toLowerCase()));
+            break;
+        case 'sort':
+            if (arg === 'importance') {
+                printTable([...todos].sort((a, b) => b.important - a.important));
+            } else if (arg === 'user') {
+                printTable([...todos].sort((a, b) => (a.user || '').localeCompare(b.user || '')));
+            } else if (arg === 'date') {
+                printTable([...todos].sort((a, b) => (b.date || '').localeCompare(a.date || '')));
+            } else {
+                console.log('Invalid sort type');
+            }
+            break;
+        case 'date':
+            printTable(todos.filter(todo => todo.date && todo.date >= arg));
+            break;
+        default:
+            console.log('wrong command');
+    }
+}
 
 function printTable(data) {
     const headers = ['!', 'user', 'date', 'comment', 'file'];
